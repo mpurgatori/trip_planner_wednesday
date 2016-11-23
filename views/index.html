@@ -1,0 +1,142 @@
+{% extends 'layout.html' %}
+
+{% block title %}Your Trip{% endblock %}
+
+{% block content %}
+<div id="app" class="clearfix">
+  <div class="map-container col-sm-8 col-lg-9">
+    <div>
+      <div id="map-canvas"></div>
+    </div>
+  </div>
+  <div id="control-panel" class="col-sm-4 col-lg-3 clearfix">
+    <div class="col-xs-6 col-sm-12">
+      <div class="panel panel-default">
+        <div class="panel-body" id="options-panel">
+          <div>
+            <h4>Hotels</h4>
+            <select data-type="hotel" id="hotel-choices">
+            </select>
+
+            <button id="add-hotel" data-action="add" class="btn btn-primary btn-circle pull-right">+</button>
+          </div>
+
+          <div>
+            <h4>Restaurants</h4>
+            <select data-type="restaurant" id="restaurant-choices">
+            </select>
+            <button id="add-restaurant" data-action="add" class="btn btn-primary btn-circle pull-right">+</button>
+          </div>
+          <div>
+            <h4>Activities</h4>
+              <select data-type="activity" id="activity-choices">
+            </select>
+            <button id="add-activity" data-action="add" class="btn btn-primary btn-circle pull-right">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-6 col-sm-12">
+      <h3>
+        <span id="day-title">Day 1</span>
+        <button class="btn btn-xs btn-danger remove btn-circle">x</button>
+      </h3>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="day-buttons">
+          <button class="btn btn-circle day-btn newButton current-day">1</button>
+          <button class="btn btn-circle day-btn" id="day-add">+</button>
+
+          </div>
+        </div>
+        <div class="panel-body" id="itinerary">
+          <div>
+            <h4>My Hotel</h4>
+            <ul id="list-hotel" class="list-group" data-type="hotel">
+
+            </ul>
+          </div>
+          <div>
+            <h4>My Restaurants</h4>
+            <ul id="list-restaurant" class="list-group">
+
+            </ul>
+          </div>
+          <div>
+            <h4>My Activities</h4>
+            <ul id="list-activity" class="list-group">
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  var hotels = {{ hotels | dump | safe }};
+  var restaurants = {{ restaurants | dump | safe }};
+  var activities = {{ activities | dump | safe }};
+
+  var options = $('#hotel-choices')
+  $.each(hotels, function(index){
+    options.append(`<option>${hotels[index].name}</option>`)
+  })
+
+  var options = $('#restaurant-choices')
+  $.each(restaurants, function(index){
+    options.append(`<option>${restaurants[index].name}</option>`)
+  })
+
+  var options = $('#activity-choices')
+  $.each(activities, function(index){
+    options.append(`<option>${activities[index].name}</option>`)
+  })
+
+  //add item to itinerary
+  var buttonC = $('.btn-circle');
+  buttonC.on('click', function(){
+
+    var value = $(this).prev().val();
+
+    var selectId = $(this).prev().data("type");
+
+    $(`#list-${selectId}`).append(`<li class="dothis">${value}<button class="btn btn-xs btn-danger remove listButton btn-circle">x</button></li>`);
+  });
+
+  //remove item from itinerary
+  $('#itinerary').on('click','.remove', function() {
+    $(this).parent().remove();
+  });
+
+//adds day to day list
+var dayNum = 2;
+$('#day-add').on('click', function(){
+  var plus = $(this).prev();
+  $($(this).prev()).after(`<button class="btn newButton btn-circle day-btn">${dayNum++}</button>`)
+})
+
+$('.day-buttons').on('click', '.newButton', function(){
+
+  $(this).addClass('current-day');
+  $($(this).siblings()).removeClass('current-day');
+
+  //switching days
+  var day = $('.current-day').text();
+  $('#day-title').text(`Day ${day}`);
+})
+
+//remove days
+$('.btn-danger').on('click', '.current-day', function(){
+
+  $('.newButton').remove()
+
+})
+
+
+
+
+</script>
+{% endblock %}
